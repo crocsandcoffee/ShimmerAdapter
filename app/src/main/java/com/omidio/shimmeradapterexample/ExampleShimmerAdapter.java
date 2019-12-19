@@ -14,8 +14,7 @@ public class ExampleShimmerAdapter extends ShimmerAdapter {
 
     private final int VIEW_TYPE_ITEM = 1;
 
-    public ExampleShimmerAdapter(boolean showShimmerInitially) {
-        super(showShimmerInitially);
+    public ExampleShimmerAdapter() {
     }
 
     @Override

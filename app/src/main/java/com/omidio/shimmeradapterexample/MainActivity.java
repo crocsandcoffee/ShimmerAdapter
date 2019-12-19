@@ -14,7 +14,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final ExampleShimmerAdapter adapter = new ExampleShimmerAdapter(true);
+        final ExampleShimmerAdapter adapter = new ExampleShimmerAdapter();
+        adapter.useShimmerConfig(null);
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(adapter);
@@ -22,8 +23,8 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                adapter.setShowShimmer(false);
+                adapter.showShimmer(false);
             }
-        }, 6000);
+        }, 20000);
     }
 }

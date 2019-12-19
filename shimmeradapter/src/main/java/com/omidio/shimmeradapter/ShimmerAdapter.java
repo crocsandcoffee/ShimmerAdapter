@@ -9,41 +9,68 @@ import android.view.animation.Animation;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.facebook.shimmer.Shimmer;
+import com.facebook.shimmer.ShimmerFrameLayout;
 
 /**
  * A custom adapter that shows a shimmer placeholder list items
- * until data is loaded. Once data is loaded, setShowShimmer should be called
+ * until data is loaded. Once data is loaded, showShimmer should be called
  * which will notify the adapter the data set has changed.
- *
- * Subclasses can override to provide their own shimmer animation.
- *
+ * <p>
+ * Subclasses can provide their own custom shimmer animation, use the default,
+ * or pass in a Shimmer configuration to use the Facebook ShimmerFrameLayout
+ * <p>
+ * NOTE: Subclasses are responsible for not overwriting the view type SHIMMER_VIEW_TYPE.
  */
 public abstract class ShimmerAdapter extends RecyclerView.Adapter {
 
     public static final int SHIMMER_VIEW_TYPE = 0;
 
-    private boolean showShimmer;
-    private Animation shimmerAnimation;
-    private final float FROM_ALPA = 1.0f;
+    private final float FROM_ALPHA = 1.0f;
     private final float TO_ALPHA = 0.3f;
     private final long SHIMMER_DURATION_MILLIS = 1000L;
 
-    public ShimmerAdapter(boolean showShimmerInitially) {
-        showShimmer = showShimmerInitially;
-        shimmerAnimation = new AlphaAnimation(FROM_ALPA, TO_ALPHA);
-        shimmerAnimation.setDuration(SHIMMER_DURATION_MILLIS);
-        shimmerAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-        shimmerAnimation.setRepeatCount(Animation.INFINITE);
-        shimmerAnimation.setRepeatMode(Animation.REVERSE);
+    private boolean useShimmerConfig = false;
+    private boolean showShimmer = true;
+    private Animation shimmerAnimation;
+    private Shimmer shimmerConfig = null;
+
+    public ShimmerAdapter() {
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+
         if (viewType == SHIMMER_VIEW_TYPE) {
-            return new ShimmerViewHolder(inflater.inflate(getShimmerLayoutId(), null, false));
+
+            if (useShimmerConfig) {
+
+                ShimmerFrameLayout shimmerFrameLayout = (ShimmerFrameLayout) inflater
+                        .inflate(R.layout.shimmer_frame_layout, parent, false);
+
+                View view = inflater.inflate(getShimmerLayoutId(), shimmerFrameLayout, false);
+
+                if (view.getLayoutParams() != null) {
+                    shimmerFrameLayout.setLayoutParams(view.getLayoutParams());
+                }
+
+                shimmerFrameLayout.addView(view);
+
+                if (this.shimmerConfig != null) {
+                    shimmerFrameLayout.setShimmer(shimmerConfig);
+                }
+
+                return new ShimmerViewHolder(shimmerFrameLayout);
+
+            } else {
+                return new ShimmerViewHolder(inflater.inflate(getShimmerLayoutId(), parent, false));
+            }
         } else {
             return getViewHolder(parent, viewType);
         }
@@ -68,32 +95,53 @@ public abstract class ShimmerAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
-        if (holder.getItemViewType() == SHIMMER_VIEW_TYPE) {
-            ((ShimmerViewHolder)holder).startShimmer(getShimmerAnimation());
+        if (holder.getItemViewType() == SHIMMER_VIEW_TYPE && !useShimmerConfig) {
+            ((ShimmerViewHolder) holder).startShimmer(getShimmerAnimation());
         }
     }
 
     @Override
     public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
-        if (holder.getItemViewType() == SHIMMER_VIEW_TYPE) {
-            ((ShimmerViewHolder)holder).stopShimmer();
+        if (holder.getItemViewType() == SHIMMER_VIEW_TYPE && !useShimmerConfig) {
+            ((ShimmerViewHolder) holder).stopShimmer();
         }
     }
 
-    public Animation getShimmerAnimation() {
+    private Animation getShimmerAnimation() {
+        if (shimmerAnimation == null) {
+            shimmerAnimation = new AlphaAnimation(FROM_ALPHA, TO_ALPHA);
+            shimmerAnimation.setDuration(SHIMMER_DURATION_MILLIS);
+            shimmerAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+            shimmerAnimation.setRepeatCount(Animation.INFINITE);
+            shimmerAnimation.setRepeatMode(Animation.REVERSE);
+        }
         return shimmerAnimation;
-    }
-
-    public boolean getShowShimmer() {
-        return this.showShimmer;
     }
 
     /**
      * Changes the shimmer mode and notifies the adapter
      */
-    public void setShowShimmer(boolean showShimmer) {
+    public void showShimmer(boolean showShimmer) {
         this.showShimmer = showShimmer;
         notifyDataSetChanged();
+    }
+
+    /**
+     * A custom animation can be passed in to be used for the shimmer animation.
+     */
+    public void useCustomShimmerAnimation(Animation animation) {
+        this.shimmerAnimation = animation;
+        this.useShimmerConfig = false;
+    }
+
+    /**
+     * If this setting is called, ShimmerFrameLayout will be used instead of the default
+     * Animation. A Shimmer config can be passed in to be set on the
+     * ShimmerFrameLayout. Passing null will use the default.
+     */
+    public void useShimmerConfig(@Nullable Shimmer shimmer) {
+        this.useShimmerConfig = true;
+        this.shimmerConfig = shimmer;
     }
 
     /**
