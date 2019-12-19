@@ -3,7 +3,7 @@
 
 ## Getting start with ShimmerAdapter
 
-##### Step 1. Add the JitPack repository to your build file
+#### Step 1. Add the JitPack repository to your build file
 
 Add it in your root build.gradle at the end of repositories:
 
@@ -16,7 +16,7 @@ Add it in your root build.gradle at the end of repositories:
   }
 ```
   
-##### Step 2. Add the dependency
+#### Step 2. Add the dependency
 ```groovy
   dependencies {
       implementation 'com.github.omid-io:ShimmerAdapter:1.1
@@ -25,7 +25,7 @@ Add it in your root build.gradle at the end of repositories:
   
 List of versions available can be found at https://jitpack.io/#omid-io/ShimmerAdapter.
 
-##### Step 3. Extend the ShimmerAdapter class and set it on your RecyclerView
+#### Step 3. Extend the ShimmerAdapter class and set it on your RecyclerView
 ```java
         ShimmerAdapter myShimmerAdapter = new ShimmerAdapter(true) {
 
@@ -61,7 +61,26 @@ List of versions available can be found at https://jitpack.io/#omid-io/ShimmerAd
         };
 ```
 
-You can pass a boolean through the constructor to indicate if the initial state of the adapter should be to show shimmer items. There are some other methods you can override, e.g. to provide your own shimmer animation if you don't want to use the default one.
+There are several other methods/options you can call on the ShimmerAdapter, below is a couple examples. 
+
+```
+useShimmerConfig(@Nullable Shimmer shimmer) 
+- pass in a Shimmer configuration or null to use the default. Calling this method will use the ShimmerFrameLayout
+
+useCustomShimmerAnimation(Animation animation)
+- pass in a custom animation to be used when the adapter is in "shimmer" mode
+```
+
+## Demo
+
+![ShimmerAdapter using default alpha animation](demo.gif) ![ShimmerAdapter using ShimmerFrameLayout animation](demo2.gif)
 
 
-![ShimmerAdapter Demo](demo.gif)
+## License
+
+This repository is released under the following licenses:
+
+ShimmerAdapter [MIT License](https://github.com/omid-io/ShimmerAdapter/blob/master/LICENSE)
+
+Facebook shimmer-android (ShimmerFrameLayout) [BSD License](https://github.com/facebook/shimmer-android/blob/master/LICENSE)
+
