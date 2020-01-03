@@ -23,15 +23,15 @@ import com.facebook.shimmer.ShimmerFrameLayout;
  * Subclasses can provide their own custom shimmer animation, use the default,
  * or pass in a Shimmer configuration to use the Facebook ShimmerFrameLayout
  * <p>
- * NOTE: Subclasses are responsible for not overwriting the view type SHIMMER_VIEW_TYPE.
+ * NOTE: Subclasses are responsible for not overwriting the view type SHIMMER_VIEW_TYPE = -1.
  */
 public abstract class ShimmerAdapter extends RecyclerView.Adapter {
 
-    public static final int SHIMMER_VIEW_TYPE = 0;
+    public static final int SHIMMER_VIEW_TYPE = -1;
 
-    private final float FROM_ALPHA = 1.0f;
-    private final float TO_ALPHA = 0.3f;
-    private final long SHIMMER_DURATION_MILLIS = 1000L;
+    private static final float FROM_ALPHA = 1.0f;
+    private static final float TO_ALPHA = 0.3f;
+    private static final long SHIMMER_DURATION_MILLIS = 1000L;
 
     private boolean useShimmerConfig = false;
     private boolean showShimmer = true;
@@ -78,7 +78,9 @@ public abstract class ShimmerAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder.getItemViewType() != SHIMMER_VIEW_TYPE) {
+        if (holder.getItemViewType() == SHIMMER_VIEW_TYPE) {
+            onBindViewShimmerHolderCallback((ShimmerViewHolder) holder, position);
+        } else {
             onBindViewHolderCallback(holder, position);
         }
     }
@@ -151,6 +153,12 @@ public abstract class ShimmerAdapter extends RecyclerView.Adapter {
     public abstract void onBindViewHolderCallback(@NonNull RecyclerView.ViewHolder holder, int position);
 
     /**
+     * Called when the holder is an instance of a ShimmerViewHolder
+     * Subclasses can override to provide additional logic in the OnBindViewHolder() stage
+     */
+    public abstract void onBindViewShimmerHolderCallback(@NonNull ShimmerViewHolder holder, int position);
+
+    /**
      * This method is called to retrieve the viewType for an item in the
      * specified position when the viewType is not VIEW_TYPE_SHIMMER
      */
@@ -164,7 +172,8 @@ public abstract class ShimmerAdapter extends RecyclerView.Adapter {
     /**
      * Return the layout id of the shimmer list item
      */
-    public abstract @LayoutRes int getShimmerLayoutId();
+    @LayoutRes
+    public abstract int getShimmerLayoutId();
 
     /**
      * Return the number of data items

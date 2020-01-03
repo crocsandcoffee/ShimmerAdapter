@@ -12,7 +12,7 @@ import com.omidio.shimmeradapter.ShimmerAdapter;
 
 public class ExampleShimmerAdapter extends ShimmerAdapter {
 
-    private final int VIEW_TYPE_ITEM = 1;
+    private static final int VIEW_TYPE_ITEM = 1;
 
     public ExampleShimmerAdapter() {
     }
@@ -20,6 +20,10 @@ public class ExampleShimmerAdapter extends ShimmerAdapter {
     @Override
     public void onBindViewHolderCallback(@NonNull RecyclerView.ViewHolder holder, int position) {
         ((ItemViewHolder)holder).setup(position);
+    }
+
+    @Override
+    public void onBindViewShimmerHolderCallback(@NonNull ShimmerViewHolder holder, int position) {
     }
 
     @Override
