@@ -35,6 +35,11 @@ List of versions available can be found at https://jitpack.io/#omid-io/ShimmerAd
             }
 
             @Override
+            public void onBindViewShimmerHolderCallback(@NonNull ShimmerViewHolder holder, int position) {
+               // your own logic here
+            }
+
+            @Override
             public int getViewType(int position) {
                 return VIEW_TYPE_DATA;
             }
